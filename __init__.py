@@ -80,4 +80,5 @@ while True:
   clear_ghosting()
   wait_for_network()
   draw(makeRequest())
-  time.sleep(180)
+  # 20 mins
+  time.sleep(3600)
