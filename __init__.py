@@ -23,49 +23,89 @@ def clear_ghosting():
 def log(text):
   print(text)
 
-def weather(data, x, y):
+def weathericon(data, x, y):
   return ugfx.Imagebox(x, y, 32, 32, '/lib/niall/icons/' + data.get("icon") + '.png')
 
-def draw(r):
-  # Rows: 32
-  try:
-    ugfx.string(2, 102, "Balance: £" +  str(r.get("bank")), "DejaVuSans20", ugfx.BLACK)
-  except:
-    print("no balance")
+def drawweather(r):
+  dayweather = r.get("weatherday")
+  xline = 106
+  xday = 115
+  xevening = 5
+
+  if(utime.localtime()[3] > 12):
+    dayweather = dayweather[1]
+  else:
+    dayweather = dayweather[0]
+    xline = 190
+    xevening = 199
+    xday = 5
+
+  ugfx.thickline(xline,0,xline,68,ugfx.BLACK,3,0)
 
   try:
-    title = r.get("dates").get("summary")[0:19]
-    time = r.get("dates").get("start").get("dateTime")[11:16]
-    ugfx.string(2, 75, time +  " - " + title, "DejaVuSans20", ugfx.BLACK)
-  except:
-    print("no cal")
+    ugfx.string(xevening + 37, 6, "17:00", "DejaVuSans20", ugfx.BLACK)
+    ugfx.string(xevening + 37, 38, str(int(r.get("weatherevening").get("precipProbability") * 100)) + "%", "DejaVuSans20", ugfx.BLACK)
 
-  ugfx.thickline(106,0,106,68,ugfx.BLACK,3,0)
-  ugfx.thickline(0,68,296,68,ugfx.BLACK,3,0)
-  try:
-    ugfx.string(42, 6, "17:00", "DejaVuSans20", ugfx.BLACK)
-    ugfx.string(42, 38, str(int(r.get("weatherevening").get("precipProbability") * 100)) + "%", "DejaVuSans20", ugfx.BLACK)
-    ugfx.string(152, 22, "WS:" + str(int(r.get("weathertomorrow").get("windSpeed"))) + "mph", "DejaVuSans20", ugfx.BLACK)
-    sunup = utime.localtime(int(r.get("weathertomorrow").get("sunriseTime")))
-    sundown = utime.localtime(int(r.get("weathertomorrow").get("sunsetTime")))
-    ugfx.string(152, 44, "S:" + str(sunup[3])+ ":" + str(sunup[4]) + "-" + str(sundown[3]) + ":" + str(sundown[4]), "DejaVuSans20", ugfx.BLACK)
-    ugfx.string(152, 0, "Temp:" + str(int(r.get("weathertomorrow").get("apparentTemperatureLow"))) + "-" + str(int(r.get("weathertomorrow").get("apparentTemperatureHigh"))) + u"\u00b0" + "C" , "DejaVuSans20", ugfx.BLACK)
+    ugfx.string(xday + 37, 22, "WS:" + str(int(dayweather.get("windSpeed"))) + "mph", "DejaVuSans20", ugfx.BLACK)
+    sunup = utime.localtime(int(dayweather.get("sunriseTime")))
+    sundown = utime.localtime(int(dayweather.get("sunsetTime")))
+    ugfx.string(xday + 37, 44, "S:" + str(sunup[3])+ ":" + str(sunup[4]) + "-" + str(sundown[3]) + ":" + str(sundown[4]), "DejaVuSans20", ugfx.BLACK)
+    ugfx.string(xday + 37, 0, "Temp:" + str(int(dayweather.get("apparentTemperatureLow"))) + "-" + str(int(dayweather.get("apparentTemperatureHigh"))) + u"\u00b0" + "C" , "DejaVuSans20", ugfx.BLACK)
   except:
     print("missing precip chance")
 
   first = ""
   second = ""
   try:
-    first = weather(r.get("weatherevening"), 5, 16)
-    second = weather(r.get("weathertomorrow"), 115, 16)
+    first = weathericon(r.get("weatherevening"), xevening, 16)
+    second = weathericon(dayweather, xday, 16)
   except:
     print("no weather")
+
+  return (first, second)
+
+def draw(r):
+  # Rows: 32
+  try:
+    ugfx.string(2, 102, "£" +  str(r.get("bank")), "DejaVuSans20", ugfx.BLACK)
+  except:
+    print("no balance")
+
+  isOtherSet = False
+
+  try:
+    title = r.get("dates").get("summary")[0:19]
+    time = r.get("dates").get("start").get("dateTime")[11:16]
+    ugfx.string(2, 75, time +  " - " + title, "DejaVuSans20", ugfx.BLACK)
+    isOtherSet = True
+  except:
+    print("no cal")
+
+  try:
+    if not isOtherSet:
+      title = r.get("news")[0:39]
+      ugfx.string(2, 75, title, "DejaVuSans20", ugfx.BLACK)
+      isOtherSet = True
+  except:
+    print("no news")
+
+  try:
+    if not isOtherSet:
+      title = r.get("other")[0:39]
+      ugfx.string(2, 75, title, "DejaVuSans20", ugfx.BLACK)
+      isOtherSet = True
+  except:
+    print("no other")
+
+  ugfx.thickline(0,68,296,68,ugfx.BLACK,3,0)
+
+  boxes = drawweather(r)
 
   ugfx.flush()
 
   try:
-    first.destroy()
-    second.destroy()
+    boxes[0].destroy()
+    boxes[1].destroy()
   except:
     print("no weather")
 
