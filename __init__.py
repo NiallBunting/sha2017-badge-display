@@ -10,6 +10,9 @@ badge.init()
 wifi.init()
 ugfx.init()
 
+#Set to London NTP TZ
+utime.settimezone("GMT+0BST-1,M3.5.0/01:00:00,M10.5.0/02:00:00")
+
 def makeRequest():
   return req.get("http://turing.niallbunting.com:4444/personal", headers={"Authorization": "apiKey 3kzWILoPBMhmKzlhtI1Ama:7FoBOTc4D3KD7TaXW3UdU6"}).json()
 
