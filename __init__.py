@@ -1,6 +1,5 @@
 import badge
 import ugfx
-import time
 import wifi
 import utime
 import deepsleep
@@ -116,7 +115,7 @@ def wait_for_network():
   if not wifi.sta_if.isconnected():
     while not wifi.sta_if.isconnected():
       log('Waiting for network')
-      time.sleep(1)
+      utime.sleep(1)
     log('Connected!')
 
 clear_ghosting()
