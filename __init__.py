@@ -3,7 +3,9 @@ import ugfx
 import time
 import wifi
 import utime
+import deepsleep
 import urequests as req
+import esp
 
 badge.init()
 wifi.init()
@@ -118,11 +120,10 @@ def wait_for_network():
     log('Connected!')
 
 clear_ghosting()
-time.sleep(1)
-
-while True:
-  clear_ghosting()
-  wait_for_network()
-  draw(makeRequest())
-  # 20 mins
-  time.sleep(3600)
+wait_for_network()
+draw(makeRequest())
+# hour
+esp.rtcmem_write_string("0", 0)
+esp.rtcmem_write_string("0", 1)
+esp.rtcmem_write_string("niall", 2)
+deepsleep.start_sleeping(3600  * 1000)
