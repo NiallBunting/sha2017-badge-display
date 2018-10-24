@@ -25,7 +25,7 @@ def clear_ghosting():
   badge.eink_busy_wait()
 
 def log(text):
-  print(text)
+  print(str(utime.time()) + ": " + text)
 
 def weathericon(data, x, y):
   return ugfx.Imagebox(x, y, 32, 32, '/lib/niall/icons/' + data.get("icon") + '.png')
