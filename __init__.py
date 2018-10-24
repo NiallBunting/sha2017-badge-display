@@ -124,8 +124,9 @@ def wait_for_network():
 clear_ghosting()
 wait_for_network()
 draw(makeRequest())
-# hour
-esp.rtcmem_write_string("0", 0)
-esp.rtcmem_write_string("0", 1)
-esp.rtcmem_write_string("niall", 2)
-deepsleep.start_sleeping(3600  * 1000)
+if(esp.rtcmem_read_string(2) != "niall"):
+  esp.rtcmem_write_string("0", 0)
+  esp.rtcmem_write_string("0", 1)
+  esp.rtcmem_write_string("niall", 2)
+# 35 mins, seems that works.
+deepsleep.start_sleeping(2100  * 1000)
