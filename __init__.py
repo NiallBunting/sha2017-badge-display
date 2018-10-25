@@ -70,36 +70,63 @@ def drawweather(r):
 
 def draw(r):
   # Rows: 32
-  try:
-    ugfx.string(2, 102, "£" +  str(r.get("bank")), "DejaVuSans20", ugfx.BLACK)
-  except:
-    print("no balance")
 
-  isOtherSet = False
+  infoLine = None
 
   try:
-    title = r.get("dates").get("summary")[0:19]
+    title = r.get("dates").get("summary")
     time = r.get("dates").get("start").get("dateTime")[11:16]
-    ugfx.string(2, 75, time +  " - " + title, "DejaVuSans20", ugfx.BLACK)
-    isOtherSet = True
+    infoLine = time +  " - " + title
   except:
     print("no cal")
 
   try:
-    if not isOtherSet:
-      title = r.get("news")[0:39]
-      ugfx.string(2, 75, title, "DejaVuSans20", ugfx.BLACK)
-      isOtherSet = True
+    if infoLine is None:
+      infoLine = r.get("news")
   except:
     print("no news")
 
   try:
-    if not isOtherSet:
-      title = r.get("other")[0:39]
-      ugfx.string(2, 75, title, "DejaVuSans20", ugfx.BLACK)
-      isOtherSet = True
+    if infoLine is None:
+      infoLine = r.get("other")
   except:
     print("no other")
+
+  if infoLine is not None:
+    font = "DejaVuSans20"
+    if (ugfx.get_string_width(infoLine, "DejaVuSans20") > 592):
+      font = "Roboto_Regular12"
+
+    firstLine = infoLine
+    while (ugfx.get_string_width(firstLine, font) > 296):
+      firstLine = firstLine[:-1]
+
+    secondLine = None
+    # Check for second line
+    if len(firstLine) != len(infoLine):
+      secondLine = infoLine[len(firstLine):]
+      while (ugfx.get_string_width(secondLine, font) > 296):
+        secondLine = secondLine[:-1]
+      if font == "Roboto_Regular12":
+        ugfx.string(2, 82, secondLine, font, ugfx.BLACK)
+      else:
+        ugfx.string(2, 90, secondLine, font, ugfx.BLACK)
+
+    # Third line
+    if font == "Roboto_Regular12":
+      if (len(firstLine) + len(secondLine)) != len(infoLine):
+        ugfx.string(2, 94, infoLine[len(firstLine)+len(secondLine):], font, ugfx.BLACK)
+
+    singleLineOffset = 0;
+    if secondLine is None:
+      singleLineOffset += 10
+
+    ugfx.string(2, 70 + singleLineOffset, firstLine, font, ugfx.BLACK)
+
+  try:
+    ugfx.string(2, 110, "£" +  str(r.get("bank")), "DejaVuSans20", ugfx.BLACK)
+  except:
+    print("no balance")
 
   ugfx.thickline(0,68,296,68,ugfx.BLACK,3,0)
 
